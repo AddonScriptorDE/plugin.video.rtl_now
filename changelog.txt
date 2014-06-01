@@ -16,3 +16,5 @@
 - Small bugfix
 1.0.8
 - Small bugfix
+1.0.9
+- Fixed site changes

@@ -68,10 +68,6 @@ def index():
 
 
 def listChannel(urlMain, thumb):
-    addDir(translation(30018), urlMain, "listVideosNew", thumb, "", "newlist")
-    addDir(translation(30017), urlMain, "listVideosNew", thumb, "", "tipplist")
-    addDir(translation(30019), urlMain, "listVideosNew", thumb, "", "top10list")
-    addDir(translation(30020), urlMain, "listVideosNew", thumb, "", "topfloplist")
     if urlMain == urlMainRTL:
         addDir(translation(30016), urlMain+"/newsuebersicht.php", "listShowsThumb", thumb)
         addDir(translation(30015), urlMain+"/sendung_a_z.php", "listShowsThumb", thumb)
@@ -79,6 +75,10 @@ def listChannel(urlMain, thumb):
         addDir(translation(30014), urlMain+"/sendung_a_z.php", "listShowsThumb", thumb)
     else:
         addDir(translation(30014), urlMain, "listShowsNoThumb", thumb)
+    addDir(translation(30018), urlMain, "listVideosNew", thumb, "", "newlist")
+    addDir(translation(30017), urlMain, "listVideosNew", thumb, "", "tipplist")
+    addDir(translation(30019), urlMain, "listVideosNew", thumb, "", "top10list")
+    addDir(translation(30020), urlMain, "listVideosNew", thumb, "", "topfloplist")
     xbmcplugin.endOfDirectory(pluginhandle)
     if forceViewMode:
         xbmc.executebuiltin('Container.SetViewMode('+viewMode+')')
@@ -91,13 +91,11 @@ def listShowsThumb(urlMain):
     entries = []
     for i in range(1, len(spl), 1):
         entry = spl[i]
-        match = re.compile('<h2>(.+?)</h2>', re.DOTALL).findall(entry)
+        match = re.compile('<h.>(.+?)</h.>', re.DOTALL).findall(entry)
         title = cleanTitle(match[0])
         match = re.compile('href="(.+?)"', re.DOTALL).findall(entry)
         url = match[0]
-        if url.startswith("http"):
-            pass
-        else:
+        if not url.startswith("http"):
             if url.startswith("/"):
                 url = url[1:]
             if "/" in url:
@@ -239,7 +237,7 @@ def listVideosNew(urlMain, type):
         spl = content.split('<div class="top10 ')
     for i in range(1, len(spl), 1):
         entry = spl[i]
-        match1 = re.compile('<h2>(.+?)</h2>', re.DOTALL).findall(entry)
+        match1 = re.compile('<h.>(.+?)</h.>', re.DOTALL).findall(entry)
         match2 = re.compile('alt="(.+?)"', re.DOTALL).findall(entry)
         if match1:
             title = cleanTitle(match1[0])
@@ -280,9 +278,9 @@ def playVideo(urlMain):
                 playpath = playpath[:playpath.rfind('.')]
             else:
                 playpath = "mp4:"+playpath
-            finalUrl = "rtmpe://"+matchRTMPE[0][0]+"/"+matchRTMPE[0][1]+"/ playpath="+playpath+" swfVfy=1 swfUrl=http://"+hosterURL+"/includes/vodplayer.swf app="+matchRTMPE[0][1]+"/_definst_ pageUrl="+urlMain
+            finalUrl = "rtmpe://"+matchRTMPE[0][0]+"/"+matchRTMPE[0][1]+"/ playpath="+playpath+" swfVfy=1 swfUrl=http://"+hosterURL+"/includes/vodplayer.swf app="+matchRTMPE[0][1]+"/_definst_ tcUrl=rtmpe://"+matchRTMPE[0][0]+"/"+matchRTMPE[0][1]+"/ pageUrl="+urlMain
         elif matchHDS:
-            finalUrl = "rtmpe://fms-fra"+str(random.randint(1, 34))+".rtl.de/"+matchHDS[0][2]+"/ playpath=mp4:"+matchHDS[0][4].replace(".f4m", "")+" swfVfy=1 swfUrl=http://"+hosterURL+"/includes/vodplayer.swf app="+matchHDS[0][2]+"/_definst_ pageUrl="+urlMain
+            finalUrl = "rtmpe://fms-fra"+str(random.randint(1, 34))+".rtl.de/"+matchHDS[0][2]+"/ playpath=mp4:"+matchHDS[0][4].replace(".f4m", "")+" swfVfy=1 swfUrl=http://"+hosterURL+"/includes/vodplayer.swf app="+matchHDS[0][2]+"/_definst_ tcUrl=rtmpe://fms-fra"+str(random.randint(1, 34))+".rtl.de/"+matchHDS[0][2]+"/ pageUrl="+urlMain
         if finalUrl:
             listitem = xbmcgui.ListItem(path=finalUrl)
             xbmcplugin.setResolvedUrl(pluginhandle, True, listitem)
